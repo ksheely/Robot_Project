@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Body
 from ...dependencies.database.database import get_db
 from ...dependencies.database.dbSchemas import Users
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, insert
 from pydantic import BaseModel
 
 
@@ -40,24 +40,27 @@ async def read_user(user_id: int, db: Session = Depends(get_db)):
 @router.get("/users", response_model=list[UserResponse])
 async def get_users(db: Session = Depends(get_db)):
     print("Getting users from database...")
+
     query = select(Users)
     result = db.execute(query)
-    print(result)
+
+    print("USERS RESULT: ", result)
+    # scalers.all returns JSON
     users = result.scalars().all()
     
-    # scalers.all returns JSON
     return users
     
 
-   
 # Define a POST route for creating a new user
-# @router.post('/users', response_model=UserResponse)
-# async def post_user(payload: dict = Body(), db: Session = Depends(get_db)):
+@router.post('/users', response_model=UserResponse)
+async def post_user(payload: dict = Body(), db: Session = Depends(get_db)):
+    print("Inserting user into database...")
+    query = insert(Users).values(**payload)
+    result = db.execute(query)
+    db.commit() # TODO: I think this is the line that is causing the error. I need to figure out how to commit the insert to the database.
+    print("CREATE USER RESULT: ", result)
 
-
-# # Create query to check if user already exists
-#     query = select(Users).where(Users.email == payload.email)
-#     existinguser = db.execute(query).scalar_one_or_none()
+#     return True
 
 #     if existinguser == 1:
 #         return True
