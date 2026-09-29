@@ -22,16 +22,16 @@ router = APIRouter()
 
 # This one needs work. I don't think I implemented it correctly.
 @router.get("/users/{user_id}", response_model=UserResponse)
-async def read_user(user_id: int, db: Session = Depends(get_db)):
+async def get_user(user_id: int, db: Session = Depends(get_db)):
     query = select(Users).where(Users.id == user_id)
     result = db.execute(query)
 
     print(result)
     # user = UserResponse.model_validate(result).model_dump()
-    user = result.scalars().one()
-    
+    user = result.scalars().one_or_none()
+
     print(user)
-    if not result:
+    if user is None:
         return {"message": "User not found"}
 
     return user
@@ -52,15 +52,15 @@ async def get_users(db: Session = Depends(get_db)):
     
 
 # Define a POST route for creating a new user
-@router.post('/users', response_model=UserResponse)
+@router.post('/users')
 async def post_user(payload: dict = Body(), db: Session = Depends(get_db)):
     print("Inserting user into database...")
     query = insert(Users).values(**payload)
     result = db.execute(query)
-    db.commit() # TODO: I think this is the line that is causing the error. I need to figure out how to commit the insert to the database.
+    db.commit()
     print("CREATE USER RESULT: ", result)
 
-#     return True
+    return True
 
 #     if existinguser == 1:
 #         return True
