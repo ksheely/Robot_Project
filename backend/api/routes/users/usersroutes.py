@@ -12,7 +12,8 @@ class UserResponse(BaseModel):
     id: int
     name: str
     email: str
-    location: str
+    password: str
+    
 
     class Config:
         from_attributes = True
@@ -53,7 +54,7 @@ async def get_users(db: Session = Depends(get_db)):
 
 # Define a POST route for creating a new user
 @router.post('/users')
-async def post_user(payload: dict = Body(), db: Session = Depends(get_db)):
+async def create_user(payload: dict = Body(), db: Session = Depends(get_db)):
     print("Inserting user into database...")
     query = insert(Users).values(**payload)
     result = db.execute(query)

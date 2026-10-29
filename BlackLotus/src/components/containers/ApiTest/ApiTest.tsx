@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 
 const ApiTest = () => {
 
@@ -19,22 +19,12 @@ const ApiTest = () => {
 
 
 useEffect(() => {
-        const params = { 
-      id: '1'
-    };    
-    
-    // 2. Convert params into a query string ("userId=123&category=books")
-    const queryString = new URLSearchParams(params).toString();
-    const url = `http://localhost:8000/users?${queryString}`;
+    const url = `http://localhost:8000/users`;
 
 
 const getapi = async () => {
     const response = await fetch(url, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json", 
-            "Access-Control-Allow-Origin": "*"
-        }
+        method: "GET"
     })
     const exampleHeader = response.headers.get('Content-Type');
     console.log("exampleHeader ", exampleHeader);

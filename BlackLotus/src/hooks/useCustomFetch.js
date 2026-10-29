@@ -29,10 +29,7 @@ export const useCustomFetch = url => {
     const { signal } = abortControllerRef.current;
 
     const headers = {
-    //   'Accept': "application/json",
       'Content-Type': options.headers && options.headers['Content-Type'] ? options.headers['Content-Type'] : 'application/json',
-    //   'x-referrer-url': document.location.origin,
-      "Access-Control-Allow-Origin": "*",
       ...options.headers
     }
 

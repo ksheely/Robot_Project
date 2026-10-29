@@ -13,7 +13,7 @@ class Users(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
-    location = Column(String)
+    password = Column(String)
 
 class Messages(Base):
     __tablename__ = "messages"

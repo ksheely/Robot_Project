@@ -9,8 +9,7 @@ const CreateUserContainer = () => {
         const response = await fetch(url, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json", 
-                "Access-Control-Allow-Origin": "*"
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(formData)
         })
