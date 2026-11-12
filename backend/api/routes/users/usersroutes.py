@@ -1,19 +1,16 @@
-from fastapi import APIRouter, Depends, Body
+from fastapi import APIRouter, HTTPException, status, Depends, Body
 from ...dependencies.database.database import get_db
 from ...dependencies.database.dbSchemas import Users
 from sqlalchemy.orm import Session
 from sqlalchemy import select, insert
 from pydantic import BaseModel
 
-
-
 # Define a Pydantic model for the user response since the ORM model cannot be directly serialized to JSON
 class UserResponse(BaseModel):
     id: int
     name: str
     email: str
-    location: str
-
+    
     class Config:
         from_attributes = True
 
@@ -27,12 +24,12 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
     result = db.execute(query)
 
     print(result)
-    # user = UserResponse.model_validate(result).model_dump()
     user = result.scalars().one_or_none()
 
     print(user)
-    if user is None:
-        return {"message": "User not found"}
+    # this will break beacause the response model is not the same as the ORM model. I need to convert the ORM model to the response model.
+    # if user is None:
+    #     return {"message": "User not found"}
 
     return user
 
@@ -42,34 +39,47 @@ async def get_users(db: Session = Depends(get_db)):
     print("Getting users from database...")
 
     query = select(Users)
+    print("QUERY: ", query)
     result = db.execute(query)
 
     print("USERS RESULT: ", result)
     # scalers.all returns JSON
     users = result.scalars().all()
+    print("USERS: ", users)
     
     return users
     
 
 # Define a POST route for creating a new user
 @router.post('/users')
-async def post_user(payload: dict = Body(), db: Session = Depends(get_db)):
+async def create_user(payload: dict = Body(), db: Session = Depends(get_db)):
     print("Inserting user into database...")
-    query = insert(Users).values(**payload)
+    query = insert(Users).values(**payload).returning(Users)
     result = db.execute(query)
     db.commit()
+    # db.refresh(**payload)  # Refresh the instance to get the generated ID
     print("CREATE USER RESULT: ", result)
+    user = result.scalars().one_or_none()
+    print("USER: ", user)
+    return user
 
-    return True
+@router.post('/login', response_model=UserResponse)
+async def login_user(payload: dict = Body(), db: Session = Depends(get_db)):
+    print("Logging in user...")
 
-#     if existinguser == 1:
-#         return True
-#     else:
-#         return False
-        #create user
+    query = select(Users).where(Users.email == payload.get("email"))
+    result = db.execute(query)
+    user = result.scalars().one_or_none()
+    print("LOGIN USER RESULT: ", result)
 
-# If user does not exist, create user
-# If user does exist, return
+    if user is None or user.password != payload.get("password"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    return user
 
 
 

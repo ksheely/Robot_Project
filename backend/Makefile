@@ -23,7 +23,9 @@ setup:
 	@python --version
 	@python -m venv .venv
 	@pip install -r requirements.txt
+	@alembic init alembic
 	@echo "✅ Setup complete!"
+
 
 install:
 	@echo "🔧 Installing Python dependencies..."
@@ -98,6 +100,7 @@ help-db:
 	
 start-db:
 	docker compose up -d
+# 	@alembic upgrade head
 
 end-db:
 	docker compose down
