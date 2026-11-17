@@ -27,7 +27,9 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - db
+      db: 
+        condition: service_healthy
+    # entrypoint: ["./entrypoint.sh"]
 
 volumes:
   db_data:

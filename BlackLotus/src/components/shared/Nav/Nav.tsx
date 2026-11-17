@@ -1,15 +1,12 @@
 import "./Nav.css";
 import logo from "../../../assets/mnsu-logo.png";
 import RouteLink from "../RouteLink";
-import {useContext} from "react";
-import { AuthContext } from "../../../state/context/authContext";
+import { useAtomValue } from "jotai";
+import { isUserLoggedInAtom } from "../../../data/atoms/isUserLoggedIn";
 
 
 const Nav = ({ }) => {
-
-  const {
-    currentUser
-  } = useContext(AuthContext)
+  const currentUser = useAtomValue(isUserLoggedInAtom)
 
   return (
   <nav className="bg-violet-400 fixed w-full z-20 top-0 start-0 border-b border-default">
@@ -35,24 +32,24 @@ const Nav = ({ }) => {
           <RouteLink text="Current Jobs" href="/currrent-jobs" /> 
         </li>
         
-        {!!currentUser
+        {currentUser
           ?(
-          <>
-            <li>
-              <RouteLink text="Login" href="/login" />
-            </li>
-            <li>
-              <RouteLink text="Create Account" href="/create-account" />
-            </li>
-          </>
-          ) 
-          : (
           <>
             <li>
               <RouteLink text="Send Message" href="/send-message" />
             </li>
             <li>
               <RouteLink text="Logout" navigateTo="/home" />
+            </li>
+          </>
+          ) 
+          : (
+          <>
+            <li>
+              <RouteLink text="Login" href="/login" />
+            </li>
+            <li>
+              <RouteLink text="Create Account" href="/create-account" />
             </li>
           </>
           )

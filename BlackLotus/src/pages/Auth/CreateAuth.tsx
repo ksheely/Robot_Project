@@ -7,7 +7,9 @@ const name = "name"
 const email = "email"
 const password = "password"
 const defaultValues = {name, email, password}
-const CreateAuth = ({callback = () => {}}) => {
+type AuthValues = { name: string; email: string; password: string };
+type CreateAuthProps = { callback?: (values: AuthValues) => void };
+const CreateAuth = ({callback = () => {}}: CreateAuthProps) => {
     const {
         setValue,
         getValues,
